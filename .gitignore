@@ -1,0 +1,22 @@
+# secrets
+.env
+
+# data (re-create by running the scripts)
+data/*
+!data/.gitkeep
+tableau/*.csv
+tableau/*.hyper
+tableau/*.twbx
+
+# python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.ipynb_checkpoints/
+
+# os / editor
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
