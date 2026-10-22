@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Do Holidays Sell Movie Tickets?</title>
+<meta name="description" content="How Halloween and Valentine's Day shape release scheduling and US box office, 2010-2025. A data project by Chen-Che (Jess) Chang.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script type="module" src="https://public.tableau.com/javascripts/api/tableau.embedding.3.latest.min.js"></script>
+<style>
+  :root {
+    --bg: #faf8f5;
+    --surface: #ffffff;
+    --ink: #1c1b1a;
+    --ink-2: #57534e;
+    --muted: #8a847d;
+    --line: #e7e2db;
+    --accent: #c8323a;
+    --accent-soft: #fbe9e9;
+    --gray-mark: #a8a29e;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #141312;
+      --surface: #1d1c1a;
+      --ink: #f2efea;
+      --ink-2: #c4bdb4;
+      --muted: #8f887f;
+      --line: #2e2c29;
+      --accent: #ef5a61;
+      --accent-soft: #3a1d1f;
+      --gray-mark: #6f6a64;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #141312;
+    --surface: #1d1c1a;
+    --ink: #f2efea;
+    --ink-2: #c4bdb4;
+    --muted: #8f887f;
+    --line: #2e2c29;
+    --accent: #ef5a61;
+    --accent-soft: #3a1d1f;
+    --gray-mark: #6f6a64;
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: 16px/1.6 "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  a { color: inherit; text-decoration-color: var(--accent); text-underline-offset: 3px; }
+  a:hover { color: var(--accent); }
+
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 16px; }
+  @media (min-width: 720px) { .wrap { padding: 0 32px; } }
+
+  header.top {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 20px 0; border-bottom: 1px solid var(--line);
+    font-size: 14px; color: var(--ink-2);
+  }
+  header.top nav { display: flex; gap: 20px; flex-wrap: wrap; }
+  header.top nav a { text-decoration: none; }
+
+  .hero { padding: 64px 0 40px; }
+  .eyebrow {
+    font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--accent); margin: 0 0 16px;
+  }
+  h1 {
+    font-family: "Fraunces", Georgia, serif; font-weight: 700;
+    font-size: clamp(36px, 7vw, 64px); line-height: 1.05; letter-spacing: -.02em;
+    margin: 0 0 20px; max-width: 14ch;
+  }
+  .lede { font-size: clamp(17px, 2.2vw, 20px); color: var(--ink-2); max-width: 60ch; margin: 0 0 28px; }
+  .meta { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip {
+    font-size: 13px; padding: 4px 10px; border: 1px solid var(--line);
+    border-radius: 999px; color: var(--ink-2); background: var(--surface);
+  }
+  .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+  .btn {
+    display: inline-block; padding: 10px 18px; border-radius: 8px; font-weight: 600;
+    font-size: 15px; text-decoration: none; border: 1px solid var(--ink);
+  }
+  .btn.primary { background: var(--ink); color: var(--bg); }
+  .btn.primary:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn.ghost:hover { border-color: var(--accent); }
+
+  .stats {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1px; background: var(--line); border: 1px solid var(--line);
+    border-radius: 12px; overflow: hidden; margin: 8px 0 72px;
+  }
+  .stat { background: var(--surface); padding: 22px 22px 24px; }
+  .stat .num {
+    font-family: "Fraunces", Georgia, serif; font-weight: 700;
+    font-size: 40px; line-height: 1.1; color: var(--accent);
+    font-variant-numeric: tabular-nums;
+  }
+  .stat .label { font-size: 14px; color: var(--ink-2); margin-top: 6px; }
+
+  section { margin-bottom: 72px; }
+  h2 {
+    font-family: "Fraunces", Georgia, serif; font-weight: 500;
+    font-size: clamp(26px, 4vw, 34px); line-height: 1.2; margin: 0 0 8px; letter-spacing: -.01em;
+  }
+  .section-sub { color: var(--ink-2); margin: 0 0 24px; max-width: 65ch; }
+
+  .viz-frame {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
+    padding: 8px; overflow-x: auto; min-height: 420px;
+  }
+  tableau-viz { display: block; width: 100%; min-width: 320px; }
+  .viz-note { font-size: 13px; color: var(--muted); margin-top: 10px; }
+
+  .findings { list-style: none; padding: 0; margin: 0; counter-reset: f; display: grid; gap: 16px; }
+  .findings li {
+    counter-increment: f; background: var(--surface); border: 1px solid var(--line);
+    border-radius: 12px; padding: 22px 22px 22px 68px; position: relative;
+  }
+  .findings li::before {
+    content: counter(f); position: absolute; left: 22px; top: 20px;
+    width: 30px; height: 30px; border-radius: 50%; background: var(--accent-soft);
+    color: var(--accent); font-weight: 600; font-size: 15px;
+    display: grid; place-items: center;
+  }
+  .findings h3 { margin: 0 0 6px; font-size: 17px; font-weight: 600; }
+  .findings p { margin: 0; color: var(--ink-2); }
+
+  .slope { width: 100%; max-width: 600px; height: auto; display: block; margin: 8px 0 0; }
+  .slope text { font: 13px "Inter", sans-serif; fill: var(--ink-2); }
+  .slope .val { font-weight: 600; fill: var(--ink); }
+
+  .two-col { display: grid; gap: 32px; }
+  @media (min-width: 820px) { .two-col { grid-template-columns: 1fr 1fr; } }
+  .card {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 24px;
+  }
+  .card h3 { margin: 0 0 12px; font-size: 17px; }
+  .card ul { margin: 0; padding-left: 18px; color: var(--ink-2); }
+  .card li { margin-bottom: 8px; }
+
+  .pipeline {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-top: 8px;
+  }
+  .step { border-left: 2px solid var(--accent); padding: 2px 0 2px 14px; }
+  .step b { display: block; font-size: 15px; }
+  .step span { font-size: 14px; color: var(--ink-2); }
+
+  footer {
+    border-top: 1px solid var(--line); padding: 28px 0 48px; font-size: 13px; color: var(--muted);
+  }
+  footer p { margin: 0 0 6px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <span>Chen-Che (Jess) Chang</span>
+    <nav>
+      <a href="#dashboard">Dashboard</a>
+      <a href="#findings">Findings</a>
+      <a href="#method">Method</a>
+      <a href="https://github.com/Jess-ChangTW/movie-holiday-boxoffice">Code</a>
+    </nav>
+  </header>
+
+  <div class="hero">
+    <p class="eyebrow">Data project · US box office 2010-2025</p>
+    <h1>Do holidays sell movie tickets?</h1>
+    <p class="lede">Studios pile horror films into the weeks before Halloween and romance into the week before Valentine's Day. Does it pay off? I combined 2,636 US theatrical releases with box office data to find out, and to separate the holiday effect from the fact that studios save their biggest films for these dates.</p>
+    <div class="meta">
+      <span class="chip">Python</span><span class="chip">pandas</span><span class="chip">statsmodels</span>
+      <span class="chip">Tableau</span><span class="chip">TMDB API</span><span class="chip">OMDb API</span>
+    </div>
+    <div class="actions">
+      <a class="btn primary" href="#dashboard">Explore the dashboard</a>
+      <a class="btn ghost" href="https://github.com/Jess-ChangTW/movie-holiday-boxoffice">View the code</a>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="num">30-34%</div><div class="label">Horror's share of releases in the 5 weeks before Halloween, vs 20% the rest of the year</div></div>
+    <div class="stat"><div class="num">$36.7M</div><div class="label">Median US gross for horror in the Halloween window, vs $22.8M at other times</div></div>
+    <div class="stat"><div class="num">-53%</div><div class="label">Drop in median gross for all other films released in the same window</div></div>
+    <div class="stat"><div class="num">+50-60%</div><div class="label">Holiday premium that remains after controlling for budget, franchise and ratings</div></div>
+  </div>
+
+  <section id="dashboard">
+    <h2>Interactive dashboard</h2>
+    <p class="section-sub">A three-part Tableau story. Use the Focus menu to switch between Horror x Halloween and Romance x Valentine's.</p>
+    <div class="viz-frame">
+      <tableau-viz
+        id="viz"
+        src="https://public.tableau.com/views/holiday_box_office/Story1"
+        toolbar="bottom"
+        hide-tabs
+        height="1000">
+      </tableau-viz>
+    </div>
+    <p class="viz-note">Not loading? <a href="https://public.tableau.com/app/profile/chen.che.chang1002/viz/holiday_box_office">Open it on Tableau Public</a>. Best viewed on a laptop or larger screen.</p>
+  </section>
+
+  <section id="findings">
+    <h2>What I found</h2>
+    <p class="section-sub">Scheduling first, then box office, then a test of whether the advantage survives controls.</p>
+    <ol class="findings">
+      <li>
+        <h3>Studios clearly bet on the holidays</h3>
+        <p>Horror's share of weekly releases jumps from a 20% average to 30-34% in the five weeks before Halloween, then falls to the year's lowest right after. Romance clusters in the week before Valentine's Day: a smaller effect, but significant (17.5% vs 13.3%, p = 0.001).</p>
+      </li>
+      <li>
+        <h3>The advantage is relative: everything else slumps</h3>
+        <p>October and early February are weak weeks for most films. In the Halloween window, other films' median gross halves while horror rises. The matched genre bucks a seasonal decline rather than riding a general boom.</p>
+        <svg class="slope" viewBox="0 0 600 220" role="img" aria-label="Slope chart: median gross from rest of year to Halloween window. Horror rises from 22.8 to 36.7 million dollars; all other films fall from 24.1 to 11.3 million dollars.">
+          <line x1="130" y1="20" x2="130" y2="190" stroke="var(--line)"/>
+          <line x1="390" y1="20" x2="390" y2="190" stroke="var(--line)"/>
+          <text x="130" y="212" text-anchor="middle">Rest of year</text>
+          <text x="390" y="212" text-anchor="middle">Halloween window</text>
+          <line x1="130" y1="114" x2="390" y2="32" stroke="var(--accent)" stroke-width="3" stroke-linecap="round"/>
+          <line x1="130" y1="106" x2="390" y2="170" stroke="var(--gray-mark)" stroke-width="3" stroke-linecap="round"/>
+          <circle cx="130" cy="114" r="5" fill="var(--accent)" stroke="var(--surface)" stroke-width="2"/>
+          <circle cx="390" cy="32" r="5" fill="var(--accent)" stroke="var(--surface)" stroke-width="2"/>
+          <circle cx="130" cy="106" r="5" fill="var(--gray-mark)" stroke="var(--surface)" stroke-width="2"/>
+          <circle cx="390" cy="170" r="5" fill="var(--gray-mark)" stroke="var(--surface)" stroke-width="2"/>
+          <text x="118" y="98" text-anchor="end" class="val">$24.1M</text>
+          <text x="118" y="128" text-anchor="end" class="val">$22.8M</text>
+          <text x="402" y="36" class="val">$36.7M  Horror</text>
+          <text x="402" y="174" class="val">$11.3M  All other films</text>
+        </svg>
+      </li>
+      <li>
+        <h3>About half is selection, half is the holiday</h3>
+        <p>Studios schedule bigger-budget and franchise films into these windows. After controlling for budget, franchise, MPA rating, IMDb rating, year and month, a premium of about 50-60% remains for both horror (p ≈ 0.01) and romance (p ≈ 0.04).</p>
+      </li>
+      <li>
+        <h3>Raw numbers can mislead</h3>
+        <p>Horror released 2-3 weeks before Halloween looks like the sweet spot in raw medians ($53.9M). With controls, the gap disappears: studios simply place their biggest horror titles there. The one robust timing pattern is that opening after Halloween hurts.</p>
+      </li>
+    </ol>
+  </section>
+
+  <section id="method">
+    <h2>How I built it</h2>
+    <p class="section-sub">A 13-step Python pipeline, each step a script with an auto-generated report.</p>
+    <div class="pipeline">
+      <div class="step"><b>Collect</b><span>56,393 US theatrical titles from TMDB; US gross for 4,761 films from OMDb</span></div>
+      <div class="step"><b>Clean</b><span>Removed placeholder dates and re-releases; strict genres tagged by both TMDB and IMDb</span></div>
+      <div class="step"><b>Describe</b><span>Genre x week heatmap, timing distributions, z-tests on release shares</span></div>
+      <div class="step"><b>Compare</b><span>Bootstrap CIs on medians, difference-in-differences on log gross</span></div>
+      <div class="step"><b>Control</b><span>OLS with genre x window interaction, robust SEs, five nested models</span></div>
+      <div class="step"><b>Present</b><span>Tableau story with a parameter that switches holidays</span></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="two-col">
+      <div class="card">
+        <h3>Data quality decisions</h3>
+        <ul>
+          <li>Used box office, not TMDB vote counts, to define a real US release. This fixed a false decline in film counts after 2014.</li>
+          <li>Flagged re-releases (Studio Ghibli re-runs, Hamilton) where TMDB and OMDb dates differed by over a year.</li>
+          <li>Used medians and log gross: 8.8% of films earn 62% of all box office.</li>
+          <li>Skipped Box Office Mojo because its robots.txt disallows automated access.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Limitations</h3>
+        <ul>
+          <li>Observational data: controls reduce but do not remove studio selection bias.</li>
+          <li>Small holiday groups (35-40 matched films per window), so intervals are wide.</li>
+          <li>IMDb rating is measured after release and may over-control.</li>
+          <li>OMDb gross is not inflation-adjusted and has small errors for some titles.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>Chen-Che (Jess) Chang · MSBA, UCLA Anderson · <a href="https://github.com/Jess-ChangTW">GitHub</a></p>
+    <p>Data: TMDB API and OMDb API (CC BY-NC 4.0). This product uses the TMDB API but is not endorsed or certified by TMDB.</p>
+  </footer>
+
+</div>
+</body>
+</html>
